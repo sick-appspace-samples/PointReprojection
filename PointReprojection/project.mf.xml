@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manifest>
+    <application name="PointReprojection">
+        <crown name="PointReprojection">
+            <desc>user script</desc>
+            <serves/>
+        </crown>
+        <meta key="author">AppSpace Sample</meta>
+        <meta key="version">2.5.0</meta>
+        <meta key="licensed">false</meta>
+        <meta key="priority">low</meta>
+        <meta key="tags">Algorithm,Image,Calibration</meta>
+        <meta key="read-protected">false</meta>
+        <meta key="copy-protected">false</meta>
+        <entry path="pages" default="Viewer.msdd">
+            <file type="application/zip">Viewer.msdd</file>
+        </entry>
+        <entry path="resources">
+            <file type="image">pose.bmp</file>
+        </entry>
+        <entry path="scripts" default="PointReprojection.lua">
+            <file type="text/x-lua">PointReprojection.lua</file>
+        </entry>
+    </application>
+</manifest>
