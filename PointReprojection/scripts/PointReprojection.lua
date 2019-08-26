@@ -32,14 +32,12 @@ local DELAY = 1000
 
 -- Creating viewer
 local viewer = View.create()
-viewer:setID('viewer2D')
 
 -- Creating axes' label texts
-local textDecoX = View.TextDecoration.create()
-textDecoX:setSize(25)
-
-local textDecoY = View.TextDecoration.create()
-textDecoY:setSize(25)
+local fontSize = 25
+local textDeco = View.TextDecoration.create()
+textDeco:setSize(fontSize)
+textDeco:setColor(0, 180, 180)
 
 -- Creating decoration attributes for text and graphics
 local lineWidth = 5
@@ -57,58 +55,81 @@ decoZ:setLineColor(0, 0, 255)
 decoZ:setPointType('DOT')
 decoZ:setPointSize(12)
 
+local decoPoints = View.ShapeDecoration.create()
+decoPoints:setLineColor(190, 0, 190)
+decoPoints:setPointType('DOT')
+decoPoints:setPointSize(12)
+
+local decoText = View.TextDecoration.create()
+decoText:setSize(10)
+
 --End of Global Scope-----------------------------------------------------------
 
 --Start of Function and Event Scope---------------------------------------------
-
 local function main()
+  -- Load a previously created camera model
+  local cameraModel = Object.load('resources/model.json')
+
+  -- Load the calibration image that was used to place the camera
   local checkerBoard = Image.load('resources/pose.bmp')
-  viewer:view(checkerBoard)
+
+  -- Finding all checkerboard corner points
+  local cornerPoints,
+    cornerIndices =
+    Image.Calibration.Pattern.detectCheckerboard(checkerBoard, 'THREE_DOT')
+
+  -- Check that the corners are detected properly
+  viewer:clear()
+  local imid = viewer:addImage(checkerBoard)
+  viewer:addShape(cornerPoints, decoPoints, nil, imid)
+  for i = 1, #cornerIndices do
+    local x,
+      y = cornerPoints[i]:getXY()
+    local xi,
+      yi = cornerIndices[i]:getXY()
+    decoText:setPosition(x, y - 10)
+    viewer:addText(string.format('(%d, %d)', xi, yi), decoText, nil, imid)
+  end
+  viewer:present()
   Script.sleep(DELAY) -- For demonstration purpose only
 
   -- Specifying the size of a square in the world
   local squareSize = 16.002 -- mm
-
-  -- Performing a one-shot calibration
-  local cameraModel, error = Image.Calibration.Pose.estimateOneShot(
-    checkerBoard,
-    {squareSize},
-    'THREE_DOT',
-    true,
-    false
-  )
-  print('Camera calibrated with average error: ' ..(math.floor(error * 10)) / 10 .. ' px')
-
-  -- Finding all checkerboard corner points
-  local cameraCalib = Image.Calibration.Camera.create()
-  cameraCalib:setCheckerSquareSideLength(squareSize)
-  local _,
-    cornerPoints = cameraCalib:findCornerPoints(checkerBoard)
-  viewer:add(cornerPoints, decoZ)
 
   -- Defining points in world coordinates for coordinate system graphics
   local axisLengthFactor = 2 -- Length of drawn X and Y axes in number of squares
   local origin = Point.create(0, 0, 0)
   local xAxisEnd = Point.create(squareSize * axisLengthFactor, 0, 0)
   local yAxisEnd = Point.create(0, squareSize * axisLengthFactor, 0)
-  local xAxisLabel = Point.create(squareSize * axisLengthFactor * 1.1, 0, 0) -- Position of "X axis label"
-  local yAxisLabel = Point.create(0, squareSize * axisLengthFactor * 1.1, 0) -- Position of "Y axis label"
+  local xAxisLabel =
+    Point.create(squareSize * axisLengthFactor, -squareSize / 2, 0) -- Position of "X axis label"
+  local yAxisLabel =
+    Point.create(-squareSize / 2, squareSize * axisLengthFactor, 0) -- Position of "Y axis label"
   local coordSystWorld = {origin, xAxisEnd, yAxisEnd, xAxisLabel, yAxisLabel}
 
   -- Reprojecting points/axes in original image coordinates
   local coordSystPixels =
     cameraModel:mapPoints(coordSystWorld, 'EXTERNAL_WORLD', 'CAMERA_PIXEL')
-
-  -- Drawing graphics in image coordinates
   local xAxis = Shape.createLineSegment(coordSystPixels[1], coordSystPixels[2])
   local yAxis = Shape.createLineSegment(coordSystPixels[1], coordSystPixels[3])
-  viewer:add(xAxis, decoX)
-  viewer:add(yAxis, decoY)
-  textDecoX:setPosition(coordSystPixels[4]:getX() - 12, coordSystPixels[4]:getY())
-  viewer:add('X', textDecoX)
-  textDecoY:setPosition(coordSystPixels[5]:getX(), coordSystPixels[5]:getY() - 12)
-  viewer:add('Y', textDecoY)
-  viewer:add(coordSystPixels[1], decoZ) -- Dot in origin to symbolize z axis
+
+  -- Plot origin marker
+  viewer:addShape(xAxis, decoX, nil, imid) -- Line from origin to some distance in X
+  viewer:addShape(yAxis, decoY, nil, imid) -- Line from origin to some distance in Y
+  viewer:addShape(coordSystPixels[1], decoZ, nil, imid) -- Dot in origin to symbolize z axis
+
+  -- Plot origin labels
+  textDeco:setPosition(
+    coordSystPixels[4]:getX() - fontSize / 2,
+    coordSystPixels[4]:getY() + fontSize / 2
+  )
+  viewer:addText('X', textDeco, nil, imid)
+  textDeco:setPosition(
+    coordSystPixels[5]:getX() - fontSize / 2,
+    coordSystPixels[5]:getY() + fontSize / 2
+  )
+  viewer:addText('Y', textDeco, nil, imid)
+
   viewer:present()
   print('App finished.')
 end
