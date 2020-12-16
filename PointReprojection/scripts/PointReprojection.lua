@@ -31,7 +31,7 @@
 local DELAY = 1000
 
 -- Creating viewer
-local viewer = View.create()
+local viewer = View.create("viewer2D1")
 
 -- Creating axes' label texts
 local fontSize = 25
