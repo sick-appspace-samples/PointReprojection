@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <manifest>
     <application name="PointReprojection">
         <crown name="PointReprojection">
@@ -7,20 +7,10 @@
         </crown>
         <meta key="author">AppSpace Sample</meta>
         <meta key="version">2.5.0</meta>
-        <meta key="licensed">false</meta>
         <meta key="priority">low</meta>
         <meta key="tags">Algorithm,Image,Calibration</meta>
         <meta key="read-protected">false</meta>
         <meta key="copy-protected">false</meta>
-        <entry path="pages" default="AppSpaceViewers-2.5.0.0.msdd">
-            <file type="application/zip">AppSpaceViewers-2.5.0.0.msdd</file>
-        </entry>
-        <entry path="resources">
-            <file type="application">model.json</file>
-            <file type="image">pose.bmp</file>
-        </entry>
-        <entry path="scripts" default="PointReprojection.lua">
-            <file type="text/x-lua">PointReprojection.lua</file>
-        </entry>
+        <entry default="PointReprojection.lua" path="scripts"/>
     </application>
 </manifest>
