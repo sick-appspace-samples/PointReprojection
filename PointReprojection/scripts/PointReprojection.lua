@@ -5,7 +5,7 @@
 local DELAY = 1000
 
 -- Creating viewer
-local viewer = View.create("viewer2D1")
+local viewer = View.create()
 
 -- Creating axes' label texts
 local fontSize = 25
@@ -40,6 +40,7 @@ decoText:setSize(10)
 --End of Global Scope-----------------------------------------------------------
 
 --Start of Function and Event Scope---------------------------------------------
+
 local function main()
   -- Load a previously created camera model
   local cameraModel = Object.load('resources/model.json')
@@ -54,15 +55,13 @@ local function main()
 
   -- Check that the corners are detected properly
   viewer:clear()
-  local imid = viewer:addImage(checkerBoard)
-  viewer:addShape(cornerPoints, decoPoints, nil, imid)
+  viewer:addImage(checkerBoard)
+  viewer:addShape(cornerPoints, decoPoints)
   for i = 1, #cornerIndices do
-    local x,
-      y = cornerPoints[i]:getXY()
-    local xi,
-      yi = cornerIndices[i]:getXY()
+    local x, y = cornerPoints[i]:getXY()
+    local xi, yi = cornerIndices[i]:getXY()
     decoText:setPosition(x, y - 10)
-    viewer:addText(string.format('(%d, %d)', xi, yi), decoText, nil, imid)
+    viewer:addText(string.format('(%d, %d)', xi, yi), decoText)
   end
   viewer:present()
   Script.sleep(DELAY) -- For demonstration purpose only
@@ -88,21 +87,21 @@ local function main()
   local yAxis = Shape.createLineSegment(coordSystPixels[1], coordSystPixels[3])
 
   -- Plot origin marker
-  viewer:addShape(xAxis, decoX, nil, imid) -- Line from origin to some distance in X
-  viewer:addShape(yAxis, decoY, nil, imid) -- Line from origin to some distance in Y
-  viewer:addShape(coordSystPixels[1], decoZ, nil, imid) -- Dot in origin to symbolize z axis
+  viewer:addShape(xAxis, decoX) -- Line from origin to some distance in X
+  viewer:addShape(yAxis, decoY) -- Line from origin to some distance in Y
+  viewer:addShape(coordSystPixels[1], decoZ) -- Dot in origin to symbolize z axis
 
   -- Plot origin labels
   textDeco:setPosition(
     coordSystPixels[4]:getX() - fontSize / 2,
     coordSystPixels[4]:getY() + fontSize / 2
   )
-  viewer:addText('X', textDeco, nil, imid)
+  viewer:addText('X', textDeco)
   textDeco:setPosition(
     coordSystPixels[5]:getX() - fontSize / 2,
     coordSystPixels[5]:getY() + fontSize / 2
   )
-  viewer:addText('Y', textDeco, nil, imid)
+  viewer:addText('Y', textDeco)
 
   viewer:present()
   print('App finished.')
